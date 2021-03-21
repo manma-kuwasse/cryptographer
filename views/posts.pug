@@ -1,0 +1,43 @@
+doctype html
+html(lang="jp")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width-scale=1.0")
+    title cryptographer
+  body.container
+    a(href="/logout") ログアウト
+    h1 cryptographer
+    div
+      a(href="/info")  info
+      br
+    form(action="/get", method="get") 
+      input(type="button" onclick="location.href='./encode';" value="する")
+    h2 投稿
+    form(method="post" action="/posts")
+      div
+        textarea(name="content" rows="4")
+        input(type="hidden" name="oneTimeToken" value=oneTimeToken)
+      div
+        button(type="submit") 投稿
+    h2 どこかから
+    each post in posts
+      div.card.my-3
+        div.card-header
+            - var isPostedByAdmin = (post.postedBy === 'admin')
+            if isPostedByAdmin
+              span #{post.id} : 管理人 ★
+            else
+              - var originalTrackingId = post.trackingCookie ? post.trackingCookie.split('_')[0] : ''
+              span #{post.id} : ID:#{originalTrackingId}  
+        p.card-text(style="white-space:pre; overflow:auto;") #{post.content}
+        div とき #{post.formattedCreatedAt}
+          - var isAdmin = (user === 'admin')
+          if isAdmin
+            div #{postedById}
+            - var isDeletable = (isAdmin)
+            if isDeletable
+              form(method="post" action="/posts?delete=1")
+                input(type="hidden" name="id" value=post.id)
+                input(type="hidden" name="oneTimeToken" value=oneTimeToken)
+                button(type="submit") 削除
+            hr
